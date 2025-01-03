@@ -19,29 +19,19 @@ export default function EditMovie() {
 
   // Fetch movie by email when the component mounts
   useEffect(() => {
-    const fetchMovieByEmail = async () => {
-      if (!userEmail) {
-        setError('User email not found. Please log in.');
+    const fetchMovieById = async () => {
+      if (!movieId) {
+        setError('Movie ID not found in URL.');
         return;
       }
       setLoading(true);
       try {
-        const response = await fetch(`/api/movies/getbyemail?userEmail=${userEmail}`);
+        const response = await fetch(`/api/movies/getbyid?id=${movieId}`);
         if (!response.ok) throw new Error('Failed to fetch movie details');
   
         const movieData = await response.json();
-  
-        // Extract movieId properly
-        const movieId = movieData._id && movieData._id.$oid ? movieData._id.$oid : movieData._id;
-  
-        if (!movieId) {
-          setError('Movie ID not found.');
-          return;
-        }
-  
-        // Store movie ID along with other movie data
         setEditingMovie({
-          movieId,
+          movieId: movieData._id,
           movieName: movieData.movieName,
           releaseYear: movieData.releaseYear,
           image: movieData.imagePath,
@@ -54,8 +44,9 @@ export default function EditMovie() {
       }
     };
   
-    fetchMovieByEmail();
-  }, [userEmail]);
+    fetchMovieById();
+  }, [movieId]);
+  
   
 
   // Handle input changes
