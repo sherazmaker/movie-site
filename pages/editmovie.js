@@ -82,7 +82,6 @@ export default function EditMovie() {
   
     setLoading(true);
     try {
-      debugger;
       const response = await fetch('/api/movies/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -197,6 +196,7 @@ export default function EditMovie() {
               </button>
               <button
                 type="submit"
+                onClick={handleSubmit}
                 className="px-8 py-3 bg-[#2BD17E] rounded-md font-Montserrat hover:bg-[#28c76f] transition"
                 disabled={loading}
               >

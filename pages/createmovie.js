@@ -167,6 +167,7 @@ export default function EditMovie() {
             <div className="flex gap-6  md:hidden justify-center">
               <button
                 type="button"
+
                 onClick={() => router.push('/movies')}
                 className="px-8 py-3 border font-Montserrat border-white rounded-md"
               >
@@ -174,6 +175,7 @@ export default function EditMovie() {
               </button>
               <button
                 type="submit"
+                onClick={handleSubmit}
                 className="px-8 py-3 bg-[#2BD17E] rounded-md font-Montserrat hover:bg-[#28c76f] transition"
                 disabled={loading}
               >
