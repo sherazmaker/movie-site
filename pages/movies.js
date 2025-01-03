@@ -140,7 +140,7 @@ const fetchMovies = async (email) => {
       {movies.length > 0 && (
         <header className="p-6 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <h1 className="text-[35px] font-montserrat">My movies</h1>
+          <h1 className="md:text-[35px] text-[14px] font-montserrat">My movies</h1>
           <IoIosAddCircleOutline onClick={handleRedirect} size={32} className="cursor-pointer text-white" />
         </div>
       
