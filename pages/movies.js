@@ -177,7 +177,7 @@ const fetchMovies = async (email) => {
                 <img
                   src={movie.imagePath}
                   alt={movie.movieName}
-                  className="h-[300px] w-[200px] object-cover"
+                  className="md:h-[300px] h-[200px]  w-[200px] object-cover"
                 />
                 <div className="p-4 flex justify-between items-center">
                   <div>
