@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     const result = await moviesCollection.deleteOne({
       _id: new ObjectId(movieId),
-      userId,
+      userEmail: userId,  // Match by email if needed
     });
 
     if (result.deletedCount === 0) {

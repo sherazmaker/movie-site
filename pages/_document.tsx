@@ -1,4 +1,4 @@
-import { Html, Head, Main, NextScript } from 'next/document';
+import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
   return (
@@ -13,7 +13,7 @@ export default function Document() {
       <body className="antialiased font-montserrat">
         <Main />
         <NextScript />
-        <div className="absolute bottom-0 ">
+        <div className="sticky bg-[#093545] bottom-0 ">
           <img
             src="/Groups.png"
             alt="Descriptive text"

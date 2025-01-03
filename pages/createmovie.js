@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MdOutlineFileDownload } from 'react-icons/md';
 
@@ -10,9 +10,18 @@ export default function EditMovie() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [userEmail, setUserEmail] = useState('');
   const router = useRouter();
 
-  const userId = 'dummyUserId'; // Replace this with the actual user ID or fetch from session
+
+  useEffect(() => {
+    const email = localStorage.getItem('userEmail'); // Retrieve email from localStorage
+    if (email) {
+      setUserEmail(email);
+    } else {
+      setError('User email not found. Please log in.');
+    }
+  }, []);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -38,39 +47,41 @@ export default function EditMovie() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!title || !year || !image) {
-      setError('All fields are required');
+  
+    if (!title || !year || !image || !userEmail) {
+      setError("All fields are required");
       return;
     }
+  
+    const formData = new FormData();
+    formData.append("movieName", title);
+    formData.append("releaseYear", year);
+    formData.append("image", image);
+    formData.append('userEmail', userEmail);
 
-    const newMovie = {
-      movieName: title,
-      releaseYear: year,
-      image,
-      userId,
-    };
-
+  
     setLoading(true);
     setError(null);
-
+  
     try {
-      const response = await fetch('/api/movies/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMovie),
+      const response = await fetch("/api/movies/create", {
+        method: "POST",
+        body: formData,
       });
-
-      if (!response.ok) throw new Error('Failed to add movie');
-
+  
+      if (!response.ok) throw new Error("Failed to add movie");
+  
       // Redirect to movies list upon successful API response
-      router.push('/movies');
+      router.push("/movies");
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+  
+
+  
 
   return (
     <div className="w-full min-h-screen  bg-[#093545]  flex justify-center p-4 ">

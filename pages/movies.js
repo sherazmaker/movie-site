@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { IoIosAddCircleOutline } from 'react-icons/io';
 import { MdOutlineLogout } from 'react-icons/md';
 
 export default function Movies() {
@@ -13,26 +15,46 @@ export default function Movies() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userEmail, setUserEmail] = useState(null);
   const moviesPerPage = 8;
 
-  const userId = 'dummyUserId'; // Replace with actual user ID from session or auth
-  const router = useRouter();
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/movies/get?userId=${userId}`);
-      if (!response.ok) throw new Error('Failed to fetch movies');
-      const data = await response.json();
-      setMovies(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    const email = localStorage.getItem('userEmail'); // Replace 'userEmail' with your actual key
+    if (email) {
+      setUserEmail(email);
+      fetchMovies(email); // Fetch movies based on email
+    } else {
+      setError('User email not found in local storage.');
     }
-  };
+  }, []);
+
+  const router = useRouter();
+ // Ensure fetchMovies gets email directly from localStorage if undefined
+const fetchMovies = async (email) => {
+  setLoading(true);
+  try {
+    const userEmailToUse = email || localStorage.getItem('userEmail'); // Fallback to fetch from localStorage
+    if (!userEmailToUse) {
+      setError('User email not found.');
+      return;
+    }
+
+    const response = await fetch(`/api/movies/get?userEmail=${userEmailToUse}`);
+    if (!response.ok) throw new Error('Failed to fetch movies');
+
+    const data = await response.json();
+    setMovies(data);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleNavigateToCreate = () => {
     router.push('/createmovie');
   };
+
   const handleAddMovie = async () => {
     if (!newMovie.image || !newMovie.movieName || !newMovie.releaseYear) {
       setError('All fields are required');
@@ -44,7 +66,7 @@ export default function Movies() {
       const response = await fetch('/api/movies/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newMovie, userId }),
+        body: JSON.stringify({ ...newMovie, userEmail }),
       });
 
       if (!response.ok) throw new Error('Failed to add movie');
@@ -57,25 +79,26 @@ export default function Movies() {
     }
   };
 
-  const handleDeleteMovie = async (movieId) => {
+  const handleDeleteMovie = async (movieId, userId) => {
     if (!confirm('Are you sure you want to delete this movie?')) return;
-
+  
     setLoading(true);
     try {
       const response = await fetch('/api/movies/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, userId }),
+        body: JSON.stringify({ movieId, userId }),  // Send both movieId and userId
       });
-
+  
       if (!response.ok) throw new Error('Failed to delete movie');
-      await fetchMovies();
+      await fetchMovies();  // Refresh the movie list after deletion
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const indexOfLastMovie = currentPage * moviesPerPage;
   const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
@@ -95,28 +118,45 @@ export default function Movies() {
   };
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    if (userEmail) {
+      fetchMovies(userEmail);
+    }
+  }, [userEmail]);
+  const handleLogout = () => {
+    // Clear user session from localStorage
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('authToken');  // If you store a token, clear it too
 
+    // Redirect to sign-in page
+    router.push('/signin');
+  }
+
+  const handleRedirect = () => {
+    router.push('/createmovie');  // Redirect to the create movie page
+  };
   return (
-    <div className="min-h-screen bg-[#093545] text-white">
+    <div className="w-full min-h-screen  bg-[#093545]  flex justify-center p-4 ">
+    <div className=" text-white">
       {movies.length > 0 && (
         <header className="p-6 flex justify-between items-center">
-          <h1 className="text-4xl font-bold">My movies 🎬</h1>
-
-          {/* Logout Button with Icon */}
-          <div className="px-6 py-2 rounded-md transition flex items-center gap-2 cursor-pointer">
-            <span>Logout</span>
-            <MdOutlineLogout size={20} />
-          </div>
-        </header>
+        <div className="flex items-center gap-3">
+          <h1 className="text-[35px] font-montserrat">My movies</h1>
+          <IoIosAddCircleOutline onClick={handleRedirect} size={32} className="cursor-pointer text-white" />
+        </div>
+      
+        {/* Logout Button with Icon */}
+        <div  onClick={handleLogout} className="px-6 py-2 rounded-md transition flex items-center gap-2 cursor-pointer">
+          <span>Logout</span>
+          <MdOutlineLogout size={20} />
+        </div>
+      </header>
       )}
 
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {movies.length === 0 ? (
         <div className="min-h-screen flex flex-col items-center justify-center">
-          <h1 className="md:text-[48px] text-[18px] font-Montserrat mb-6">
+          <h1 className="md:text-[48px] font-semibold text-[18px] font-Montserrat mb-6">
             Your movie list is empty
           </h1>
           <button
@@ -132,29 +172,29 @@ export default function Movies() {
             {selectedMovies.map((movie) => (
               <div
                 key={movie._id}
-                className="overflow-hidden bg-[#16384c] rounded-lg shadow-md"
+                className="overflow-hidden bg-[#16384c] rounded-lg shadow-md relative"
               >
                 <img
-                  src={movie.image}
+                  src={movie.imagePath}
                   alt={movie.movieName}
-                  className="h-[300px] w-full object-cover"
+                  className="h-[300px] w-[200px] object-cover"
                 />
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold">{movie.movieName}</h2>
-                  <p className="text-sm text-gray-300">{movie.releaseYear}</p>
-                  <div className="mt-4 flex space-x-2">
-                    <button
-                      onClick={() => setEditingMovie(movie)}
-                      className="bg-yellow-500 hover:bg-yellow-600 font-Montserrat text-white px-4 py-2 rounded-md"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteMovie(movie._id)}
-                      className="bg-red-500 hover:bg-red-600 font-Montserrat text-white px-4 py-2 rounded-md"
-                    >
-                      Delete
-                    </button>
+                <div className="p-4 flex justify-between items-center">
+                  <div>
+                    <h2 className="text-lg font-semibold">{movie.movieName}</h2>
+                    <p className="text-sm text-gray-300">{movie.releaseYear}</p>
+                  </div>
+                  <div className="flex space-x-4">
+                    <FaEdit
+                      className="text-yellow-500 hover:text-yellow-600 cursor-pointer"
+                      size={20}
+                      onClick={() => router.push(`/editmovie?id=${movie._id}`)}
+                    />
+                    <FaTrash
+                      className="text-red-500 hover:text-red-600 cursor-pointer"
+                      size={20}
+                      onClick={() => handleDeleteMovie(movie._id, userEmail)}
+                    />
                   </div>
                 </div>
               </div>
@@ -206,6 +246,7 @@ export default function Movies() {
           </button>
         </div>
       )}
+    </div>
     </div>
   );
 }

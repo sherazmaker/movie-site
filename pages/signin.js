@@ -54,9 +54,11 @@ export default function Signin() {
       }
 
       if (response.ok) {
-        localStorage.setItem("user", JSON.stringify({ email }));
+        // Save the user's email in localStorage under a dedicated key
+        localStorage.setItem("userEmail", email); 
         router.push("/movies");
       }
+      
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred");
@@ -64,9 +66,9 @@ export default function Signin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#093545]">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f2d3c]">
       <div className="p-8 max-w-sm w-full">
-        <h1 className="text-[20px] font-Montserrattext-center text-white mb-6">
+        <h1 className="text-[30px] font-semibold font-Montserrat text-center text-white mb-6">
           Sign in
         </h1>
 
@@ -82,7 +84,7 @@ export default function Signin() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 bg-[#224957] font-Montserrat text-white rounded-xl outline-none"
+              className="w-full p-2 bg-[#224957] font-Montserrat border-none text-white rounded-xl outline-none"
               required
             />
           </div>
@@ -93,7 +95,7 @@ export default function Signin() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 bg-[#224957] font-Montserrat text-white rounded-xl outline-none"
+              className="w-full p-2 bg-[#224957] font-Montserrat border-none text-white rounded-xl outline-none"
               required
             />
             <button
@@ -126,14 +128,14 @@ export default function Signin() {
                 />
               </svg>
             </label>
-            <label htmlFor="remember" className="cursor-pointer select-none font-Montserrat">
+            <label htmlFor="remember" className="cursor-pointer select-none font-Montserrat text-[14px]">
               Remember me
             </label>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#2BD17E] p-3 text-lg text-white rounded-xl font-Montserrat"
+            className="w-full bg-[#2BD17E] p-3 text-lg text-[14px] text-white rounded-xl font-Montserrat"
           >
             Login
           </button>

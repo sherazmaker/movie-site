@@ -14,7 +14,7 @@ const Home = () => {
 
   useEffect(() => {
     // Check if the user is authenticated
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem('userEmail');
     if (!user) {
       router.push('/signin'); // Redirect if not logged in
     }
