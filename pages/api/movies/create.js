@@ -47,9 +47,8 @@ router.post(async (req, res) => {
     const command = new PutObjectCommand(uploadParams);
     await s3.send(command);
     
-
-    // Connect to MongoDB
-    client = new MongoClient(process.env.MONGODB_URI);
+    const uri = "mongodb+srv://saadshafiq1270:FMTkqfNmXZ49yyDV@cluster0.nqou9.mongodb.net/movieDB?retryWrites=true&w=majority";
+    client = new MongoClient(uri);
     await client.connect();
     const db = client.db("movieDB");
     const moviesCollection = db.collection("movies");

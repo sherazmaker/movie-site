@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   let client;
 
   try {
-    client = new MongoClient(process.env.MONGODB_URI);
+     const uri = "mongodb+srv://saadshafiq1270:FMTkqfNmXZ49yyDV@cluster0.nqou9.mongodb.net/movieDB?retryWrites=true&w=majority";
+    client = new MongoClient(uri);
     await client.connect();
     const db = client.db('movieDB');
     const moviesCollection = db.collection('movies');
