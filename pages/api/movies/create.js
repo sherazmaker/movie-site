@@ -6,10 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 
 // Configure AWS S3 Client
 const s3 = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.AMPLIFY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.AMPLIFY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AMPLIFY_AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -38,7 +38,7 @@ router.post(async (req, res) => {
 
     // Upload image to S3
     const uploadParams = {
-      Bucket: process.env.S3_BUCKET_NAME,
+      Bucket: process.env.AMPLIFY_S3_BUCKET_NAME,
       Key: fileName,
       Body: image.buffer,
       ContentType: image.mimetype,
@@ -58,7 +58,7 @@ router.post(async (req, res) => {
       userEmail,
       movieName,
       releaseYear,
-      imagePath: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`,
+      imagePath: `https://${process.env.AMPLIFY_S3_BUCKET_NAME}.s3.${process.env.AMPLIFY_AWS_REGION}.amazonaws.com/${fileName}`,
       createdAt: new Date(),
     };
 
